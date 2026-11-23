@@ -19,20 +19,20 @@ PROCESSED_TILES_DIR = BASE_DIR / "01_DATA" / "processed_tiles"
 
 def log_step(msg):
     print("\n" + "="*70)
-    print(f"🚀 {msg}")
+    print(msg)
     print("="*70)
 
 def clear_cache_and_memory():
-    """Aggressively purges YOLO caches and python GC to free memory and disk space."""
+    """Remove YOLO cache files and collect unreachable Python objects."""
     print("[*] Performing deep cache sweep...")
     for cache_file in PROCESSED_TILES_DIR.rglob("*.cache"):
         try:
             cache_file.unlink()
             print(f"    - Purged: {cache_file.name}")
-        except Exception as e:
-            pass
+        except OSError as exc:
+            print(f"[WARN] Could not remove {cache_file}: {exc}")
             
-    # Force OS to flush file system buffers (simulated via gc for python scopes)
+    # Collect unreachable Python objects; this does not flush filesystem buffers.
     import gc
     gc.collect()
 
@@ -44,7 +44,7 @@ def run_with_retry(cmd_list, max_retries=3, cwd=str(BASE_DIR)):
             result = subprocess.run(cmd_list, cwd=cwd, check=True, text=True)
             return True
         except subprocess.CalledProcessError as e:
-            print(f"[🚨 ERROR] Command failed with exit code: {e.returncode}")
+            print(f"[ERROR] Command failed with exit code: {e.returncode}")
             if attempt < max_retries:
                 wait_time = 5 * attempt
                 print(f"[*] Retrying in {wait_time} seconds (Attempt {attempt + 1}/{max_retries})...")

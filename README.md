@@ -14,6 +14,8 @@ It can analyse standard microscopy images directly and uses tile-based processin
 
 > **Research use only.** Model output identifies visual AFB candidates; it does not identify *Mycobacterium tuberculosis*, confirm tuberculosis, or replace laboratory or clinical judgement.
 
+**Checkpoint status:** The included checkpoint is retained for historical research and is on validation hold. Documented dataset leakage and annotation problems prevent independent performance claims or clinical use. See [MODEL_CARD.md](MODEL_CARD.md) and [DATA_CARD.md](DATA_CARD.md).
+
 ## Model at a glance
 
 | Item | Description |

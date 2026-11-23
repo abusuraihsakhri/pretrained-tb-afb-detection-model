@@ -11,16 +11,16 @@ import shutil
 from pathlib import Path
 
 DATASETS = [
-    # 🛡️ Baseline TB-AFB microscopy cohorts (7,979 patches)
+    # Configured microscopy sources
     {"workspace": "swu-5alfk", "project": "tuberculosis-p8whq", "version": 1, "afb_class_ids": {0, 1}},
     {"workspace": "swu-5alfk", "project": "tuberculosis-czyfb", "version": 3, "afb_class_ids": {0}},
     {"workspace": "huzaifa-athar", "project": "afb-zpazz", "version": 1, "afb_class_ids": {0}},
     {"workspace": "naresuan-university-1yqlq", "project": "technique-for-detecting-acid-fast-bacilli", "version": 15, "afb_class_ids": {0, 1}},
 
-    # 🚀 Expansion Cohort #1 (2,899 patches, 10,000+ AFB instances)
+    # Additional public microscopy source
     {"workspace": "detection-tb", "project": "tuberculosis-2", "version": 5, "afb_class_ids": {0, 1}},
 
-    # 🚀 Expansion Cohort #2 (2,108 patches, 8,817 AFB instances)
+    # Quarantined source; excluded unless explicitly approved
     {
         "workspace": "afb-dataset",
         "project": "afb-detect",
@@ -33,7 +33,7 @@ DATASETS = [
         ),
     },
 
-    # 🚀 Expansion Cohort #3 (371 patches, 1,959 AFB instances)
+    # Additional public microscopy source
     {"workspace": "suci-aulia", "project": "afb-test-y7", "version": 10, "afb_class_ids": {0}},
 ]
 

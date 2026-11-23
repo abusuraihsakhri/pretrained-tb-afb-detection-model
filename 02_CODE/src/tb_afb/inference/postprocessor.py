@@ -1,12 +1,15 @@
+from typing import Dict, List
+
 import numpy as np
-from typing import List, Dict
+
 
 class DetectionPostprocessor:
-    """Confidence filtering, optional calibrated morphology, and global NMS."""
-    MIN_ASPECT_RATIO = 2.0      
-    MAX_ASPECT_RATIO = 10.0     
-    MIN_AREA_MICRONS = 2.0       
-    MAX_AREA_MICRONS = 20.0     
+    """Filter candidate boxes by confidence, optional morphology, and global NMS."""
+
+    MIN_ASPECT_RATIO = 2.0
+    MAX_ASPECT_RATIO = 10.0
+    MIN_AREA_MICRONS = 2.0
+    MAX_AREA_MICRONS = 20.0
 
     def __init__(
         self,
@@ -15,6 +18,10 @@ class DetectionPostprocessor:
         *,
         enable_morphology_filter: bool = False,
     ):
+        if not 0.0 <= min_confidence <= 1.0:
+            raise ValueError("min_confidence must be in [0, 1].")
+        if not 0.0 <= nms_iou_threshold <= 1.0:
+            raise ValueError("nms_iou_threshold must be in [0, 1].")
         self.min_confidence = min_confidence
         self.nms_iou_threshold = nms_iou_threshold
         self.enable_morphology_filter = enable_morphology_filter
@@ -28,89 +35,102 @@ class DetectionPostprocessor:
         if not detections:
             return []
         if self.enable_morphology_filter and (
-            pixel_size_microns is None or pixel_size_microns <= 0
+            pixel_size_microns is None
+            or not np.isfinite(pixel_size_microns)
+            or pixel_size_microns <= 0
         ):
             raise ValueError(
                 "Morphology filtering requires a positive calibrated microns-per-pixel value."
             )
-            
-        filtered = []
-        for det in detections:
-            bbox = det.get('bbox', [0,0,0,0]) # [x, y, w, h]
-            w, h = bbox[2], bbox[3]
-            
-            # 🛡️ SECURITY CONTROL: Zero division trap for malformed network bounding boxes
-            if w <= 0 or h <= 0:
-                continue
-                
-            aspect_ratio = max(w, h) / (min(w, h) + 1e-6)
-            conf = det.get('confidence', 0)
 
-            if conf < self.min_confidence:
+        filtered = []
+        boxes = []
+        scores = []
+        for detection in detections:
+            if not isinstance(detection, dict):
                 continue
+            bbox = detection.get("bbox")
+            if not isinstance(bbox, (list, tuple, np.ndarray)) or len(bbox) != 4:
+                continue
+            try:
+                cx, cy, width, height = (float(value) for value in bbox)
+                confidence = float(detection.get("confidence", 0))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if not np.isfinite([cx, cy, width, height, confidence]).all():
+                continue
+            if width <= 0 or height <= 0 or confidence < self.min_confidence:
+                continue
+
             if self.enable_morphology_filter:
-                area_microns = (
-                    w * float(pixel_size_microns)
-                ) * (h * float(pixel_size_microns))
+                aspect_ratio = max(width, height) / min(width, height)
+                area_microns = width * height * pixel_size_microns ** 2
                 if not self.MIN_ASPECT_RATIO <= aspect_ratio <= self.MAX_ASPECT_RATIO:
                     continue
                 if not self.MIN_AREA_MICRONS <= area_microns <= self.MAX_AREA_MICRONS:
                     continue
-            filtered.append(det)
-        
-        # Apply NMS to the filtered detections
+
+            filtered.append(detection)
+            boxes.append([
+                cx - width / 2,
+                cy - height / 2,
+                cx + width / 2,
+                cy + height / 2,
+            ])
+            scores.append(confidence)
+
         if not filtered:
             return []
-            
-        boxes = np.array([d['bbox'] for d in filtered])
-        # Convert [x_center, y_center, w, h] to [x1, y1, x2, y2]
-        x1 = boxes[:, 0] - boxes[:, 2] / 2
-        y1 = boxes[:, 1] - boxes[:, 3] / 2
-        x2 = boxes[:, 0] + boxes[:, 2] / 2
-        y2 = boxes[:, 1] + boxes[:, 3] / 2
-        
-        scores = np.array([d['confidence'] for d in filtered])
-        keep_indices = self.apply_nms(np.stack([x1, y1, x2, y2], axis=1), scores, self.nms_iou_threshold)
-        
+        keep_indices = self.apply_nms(
+            np.asarray(boxes, dtype=np.float64),
+            np.asarray(scores, dtype=np.float64),
+            self.nms_iou_threshold,
+        )
         return [filtered[i] for i in keep_indices]
 
-    def _validate_color(self, image: np.ndarray, bbox: List[int]) -> bool:
-        """Verify detection contains purple-red pixels (ZN Staining)"""
-        # Security: Bound check bbox against image
-        return True
-
-    def apply_nms(self, boxes: np.ndarray, scores: np.ndarray, iou_threshold: float = 0.5) -> List[int]:
-        """
-        Non-maximum suppression (Vectorized NumPy Implementation).
-        boxes: [x1, y1, x2, y2]
-        """
+    @staticmethod
+    def apply_nms(
+        boxes: np.ndarray,
+        scores: np.ndarray,
+        iou_threshold: float = 0.5,
+    ) -> List[int]:
+        boxes = np.asarray(boxes, dtype=np.float64)
+        scores = np.asarray(scores, dtype=np.float64)
+        if boxes.ndim != 2 or boxes.shape[1] != 4:
+            raise ValueError("boxes must be an (N, 4) array.")
+        if scores.ndim != 1 or len(scores) != len(boxes):
+            raise ValueError("scores must contain one value per box.")
+        if not np.isfinite(boxes).all() or not np.isfinite(scores).all():
+            raise ValueError("boxes and scores must be finite.")
+        if not 0.0 <= iou_threshold <= 1.0:
+            raise ValueError("iou_threshold must be in [0, 1].")
         if len(boxes) == 0:
             return []
-            
-        x1 = boxes[:, 0]
-        y1 = boxes[:, 1]
-        x2 = boxes[:, 2]
-        y2 = boxes[:, 3]
-        
+
+        x1, y1, x2, y2 = boxes.T
         areas = np.maximum(0.0, x2 - x1) * np.maximum(0.0, y2 - y1)
         order = scores.argsort()[::-1]
-        
         keep = []
-        while order.size > 0:
-            i = order[0]
-            keep.append(i)
-            
-            xx1 = np.maximum(x1[i], x1[order[1:]])
-            yy1 = np.maximum(y1[i], y1[order[1:]])
-            xx2 = np.minimum(x2[i], x2[order[1:]])
-            yy2 = np.minimum(y2[i], y2[order[1:]])
-            
-            w = np.maximum(0.0, xx2 - xx1)
-            h = np.maximum(0.0, yy2 - yy1)
-            inter = w * h
-            
-            ovr = inter / (areas[i] + areas[order[1:]] - inter + 1e-6)
-            inds = np.where(ovr <= iou_threshold)[0]
-            order = order[inds + 1]
-            
+
+        while order.size:
+            current = int(order[0])
+            keep.append(current)
+            remaining = order[1:]
+            if remaining.size == 0:
+                break
+
+            xx1 = np.maximum(x1[current], x1[remaining])
+            yy1 = np.maximum(y1[current], y1[remaining])
+            xx2 = np.minimum(x2[current], x2[remaining])
+            yy2 = np.minimum(y2[current], y2[remaining])
+            intersection = np.maximum(0.0, xx2 - xx1) * np.maximum(0.0, yy2 - yy1)
+            union = areas[current] + areas[remaining] - intersection
+            iou = np.divide(
+                intersection,
+                union,
+                out=np.zeros_like(intersection),
+                where=union > 0,
+            )
+            order = remaining[iou <= iou_threshold]
+
         return keep

@@ -11,16 +11,16 @@ class AuditLogger:
     the other controls required for regulated audit trails.
     """
     def __init__(self, log_dir: Path, user_id: str):
-        # 🛡️ SECURITY CONTROL: Absolute localized path enforcement
+        # Resolve the configured local log directory.
         self.log_dir = Path(log_dir).resolve()
         self.log_dir.mkdir(parents=True, exist_ok=True)
         self.user_id = str(user_id)
 
     def _write_log(self, data: Dict):
-        # 🛡️ SECURITY CONTROL: Append-only strict logs, sanitizing input metadata to prevent Log Injection (CRLF)
+        # Escape embedded line breaks so each event occupies one JSON line.
         safe_data = {}
         for k, v in data.items():
-            # Stripping newline characters maliciously injected into metadata attributes
+            # Preserve newline characters as escaped text in log fields.
             safe_val = str(v).replace('\n', '\\n').replace('\r', '\\r')
             safe_data[str(k)] = safe_val
             
