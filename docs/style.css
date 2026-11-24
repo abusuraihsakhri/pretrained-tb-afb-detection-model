@@ -94,7 +94,7 @@ thead th { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-tr
 tbody th { font-weight: 600; }
 .number { white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
 .method-note { margin: 14px 0 0; color: var(--muted); font-size: 13px; }
-.method-note a, .text-link { color: var(--accent); font-weight: 700; }
+.method-note a, .text-link, .public-note a { color: var(--accent); font-weight: 700; }
 .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .metrics div { padding: 12px 8px 12px 0; }
 .metrics dt { font-size: 12px; }
