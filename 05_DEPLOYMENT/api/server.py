@@ -143,7 +143,7 @@ def require_mutation_key(
     if x_api_key is None or not secrets.compare_digest(x_api_key, API_TOKEN):
         raise HTTPException(status_code=401, detail="Valid X-API-Key required.")
 
-# 🛡️ ARCHITECTURE: Global Hot-Swap Cache for Active Learning Weights
+# Cache the loaded checkpoint and replace it when the checkpoint changes.
 ACTIVE_MODEL = None
 ACTIVE_MODEL_PATH = None
 TRAINING_PROCESS = None
@@ -391,7 +391,7 @@ async def save_annotation(
     except (json.JSONDecodeError, TypeError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=f"Invalid annotation payload: {exc}")
     
-    # 🛡️ SECURITY REMEDIATION: Validate image binary decoding before saving to prevent corrupt/arbitrary file upload
+    # Validate image binary decoding before saving to prevent corrupt/arbitrary file upload
     contents = await file.read()
     if len(contents) > MAX_FILE_SIZE:
         raise HTTPException(status_code=413, detail="File too large.")
@@ -447,7 +447,7 @@ async def trigger_training(_: None = Depends(require_mutation_key)):
             status_code=403,
             detail="Remote training is disabled. Set TB_AFB_ALLOW_REMOTE_TRAINING=1 explicitly.",
         )
-    # 🛡️ SECURITY REMEDIATION: Prevent multiple concurrent background processes (Process Bombing / DoS)
+    # Prevent multiple concurrent background processes (Process Bombing / DoS)
     if TRAINING_PROCESS is not None and TRAINING_PROCESS.poll() is None:
         raise HTTPException(
             status_code=409, 
@@ -500,7 +500,7 @@ async def render_payload(
 
 @app.get("/api/v1/stats")
 async def get_stats(_: None = Depends(require_api_key)):
-    # 🛡️ SECURITY: Safe enumeration of dataset to expose metrics without Arbitrary File Reads
+    # Safe enumeration of dataset to expose metrics without Arbitrary File Reads
     train_dir = current_dir.parent.parent / "01_DATA" / "processed_tiles" / "train"
     img_dir = train_dir / "images"
     lbl_dir = train_dir / "labels"
@@ -605,7 +605,7 @@ async def get_wsi_tile(
         raise HTTPException(status_code=501, detail="OpenSlide DeepZoom not available on this host.")
         
     # Security: Ensure WSI_ID is not a path injection
-    # 🛡️ REMEDIATION: Force filename-only resolution and strict is_relative_to validation
+    # Force filename-only resolution and strict is_relative_to validation
     safe_wsi_id = Path(wsi_id).name
     if safe_wsi_id != wsi_id:
         raise HTTPException(status_code=400, detail="Invalid WSI identifier.")

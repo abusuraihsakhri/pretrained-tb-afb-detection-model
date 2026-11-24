@@ -14,7 +14,7 @@ import os
 
 import yaml
 
-# 🛡️ 6GB VRAM SAFETY: Prevent CUDA memory fragmentation over long multi-epoch runs
+# Prevent CUDA memory fragmentation over long multi-epoch runs
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 # Ensure local packages are resolvable
@@ -30,7 +30,7 @@ def secure_yaml_resolution(base_dir: Path, yaml_path: str) -> Path:
     base_dir = base_dir.resolve()
     requested_path = (base_dir / yaml_path).resolve()
     
-    # 🛡️ SECURITY REMEDIATION: Strict relative path verification prevents sibling prefix bypass
+    # Strict relative path verification prevents sibling prefix bypass
     try:
         if not requested_path.is_relative_to(base_dir):
             raise PermissionError("Path traversal pattern matching denied for YAML configs.")
@@ -121,7 +121,7 @@ def main():
     parser.add_argument("--batch", type=int, default=16)
     args = parser.parse_args()
     
-    # 🛡️ SAFETY CHECK: Ensure we don't crash the OS during massive ingestion
+    # Ensure we don't crash the OS during massive ingestion
     if not check_disk_space(min_gb=10.0):
         sys.exit(1)
 
@@ -145,7 +145,7 @@ def main():
             git_commit=git_commit(project_root),
         )
         
-        # 🛡️ CLEANUP: Remove old YOLO caches to ensure new public data is indexed
+        # Remove old YOLO caches to ensure new public data is indexed
         for cache_file in Path("01_DATA/processed_tiles").rglob("*.cache"):
             try:
                 cache_file.unlink()
@@ -153,7 +153,7 @@ def main():
             except OSError as exc:
                 print(f"[WARN] Could not remove cache {cache_file}: {exc}")
 
-        # 🛡️ VRAM PRE-FLIGHT: Empty GPU cache and log device headroom
+        # Empty GPU cache and log device headroom
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
             gpu_name = torch.cuda.get_device_name(0)

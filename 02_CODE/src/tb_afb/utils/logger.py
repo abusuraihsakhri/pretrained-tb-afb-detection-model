@@ -11,13 +11,13 @@ class AuditLogger:
     the other controls required for regulated audit trails.
     """
     def __init__(self, log_dir: Path, user_id: str):
-        # 🛡️ SECURITY CONTROL: Absolute localized path enforcement
+        # Absolute localized path enforcement
         self.log_dir = Path(log_dir).resolve()
         self.log_dir.mkdir(parents=True, exist_ok=True)
         self.user_id = str(user_id)
 
     def _write_log(self, data: Dict):
-        # 🛡️ SECURITY CONTROL: Append-only strict logs, sanitizing input metadata to prevent Log Injection (CRLF)
+        # Append-only strict logs, sanitizing input metadata to prevent Log Injection (CRLF)
         safe_data = {}
         for k, v in data.items():
             # Stripping newline characters maliciously injected into metadata attributes

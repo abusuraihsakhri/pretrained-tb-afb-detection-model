@@ -39,7 +39,7 @@ class DetectionPostprocessor:
             bbox = det.get('bbox', [0,0,0,0]) # [x, y, w, h]
             w, h = bbox[2], bbox[3]
             
-            # 🛡️ SECURITY CONTROL: Zero division trap for malformed network bounding boxes
+            # Zero division trap for malformed network bounding boxes
             if w <= 0 or h <= 0:
                 continue
                 
