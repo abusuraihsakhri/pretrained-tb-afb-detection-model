@@ -24,7 +24,7 @@
   <meta name="twitter:title" content="AFB Detection Model for Digital Microscopy">
   <meta name="twitter:description" content="A YOLOv8n deep-learning model for candidate AFB detection in Ziehl–Neelsen microscopy images, with tiled large-image inference.">
   <meta name="twitter:image" content="https://abusuraihsakhri.github.io/pretrained-tb-afb-detection-model/og-card.png">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
   <script src="script.js" defer></script>
   <script type="application/ld+json">
   {
@@ -105,7 +105,7 @@
   <p class="section-intro">The released model is a deep-learning object detector trained for 150 epochs on labelled Ziehl–Neelsen microscopy imagery. It predicts the location of visual AFB candidates; each prediction includes a bounding box and confidence score.</p>
   <div class="model-grid">
     <div class="evidence-card">
-      <div class="table-scroll" tabindex="0" aria-label="Scrollable model specification table">
+      <div class="table-scroll" tabindex="0" aria-label="Model specification table">
         <table>
           <caption>Model specification</caption>
           <thead><tr><th scope="col">Item</th><th scope="col">Description</th></tr></thead>
@@ -134,19 +134,19 @@
 
 <section id="architecture" class="section" aria-labelledby="architecture-title">
   <p class="eyebrow">ARCHITECTURE</p><h2 id="architecture-title">Processing steps</h2>
-  <div class="architecture" aria-label="Model processing architecture">
-    <div><span>Input</span><strong>ZN microscopy image / WSI</strong></div><i aria-hidden="true">→</i>
-    <div><span>Imaging</span><strong>OpenCV / OpenSlide</strong></div><i aria-hidden="true">→</i>
-    <div><span>Detection</span><strong>PyTorch + YOLOv8n</strong></div><i aria-hidden="true">→</i>
-    <div><span>Post-processing</span><strong>Tiling + global NMS</strong></div><i aria-hidden="true">→</i>
-    <div><span>Output</span><strong>Boxes + confidence scores</strong></div><i aria-hidden="true">→</i>
-    <div><span>Access</span><strong>CLI / FastAPI / Web UI</strong></div>
-  </div>
+  <ol class="architecture" role="list" aria-label="Model processing steps">
+    <li><span>Input</span><strong>ZN microscopy image / WSI</strong></li>
+    <li><span>Imaging</span><strong>OpenCV / OpenSlide</strong></li>
+    <li><span>Detection</span><strong>PyTorch + YOLOv8n</strong></li>
+    <li><span>Post-processing</span><strong>Tiling + global NMS</strong></li>
+    <li><span>Output</span><strong>Boxes + confidence scores</strong></li>
+    <li><span>Access</span><strong>CLI / FastAPI / Web UI</strong></li>
+  </ol>
 </section>
 
 <section id="quickstart" class="section split" aria-labelledby="quickstart-title">
   <div><p class="eyebrow">QUICK START</p><h2 id="quickstart-title">Run the model on your own image.</h2><p>Install the project requirements, then pass the included checkpoint and a local microscopy image to the inference command.</p></div>
-  <div class="code-panel"><pre><code>git clone https://github.com/abusuraihsakhri/pretrained-tb-afb-detection-model.git
+  <div class="code-panel"><pre tabindex="0" aria-label="Quick start commands"><code>git clone https://github.com/abusuraihsakhri/pretrained-tb-afb-detection-model.git
 cd pretrained-tb-afb-detection-model
 python -m pip install -r requirements.txt
 
