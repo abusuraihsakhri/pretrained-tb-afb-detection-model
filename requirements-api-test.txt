@@ -1,8 +1,8 @@
-pytest==8.4.2
-fastapi==0.141.1
-pydantic==2.12.5
+pytest==9.2.0
+fastapi==0.165.0
+pydantic==2.14.4
 httpx==0.28.1
-numpy==1.26.4
-opencv-python-headless==4.10.0.84
-python-multipart==0.0.32
-fpdf2==2.8.8
+numpy==2.5.5
+opencv-python-headless==5.1.0.95
+python-multipart==0.0.34
+fpdf2==2.9.0
