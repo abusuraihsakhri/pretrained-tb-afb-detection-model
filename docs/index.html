@@ -76,7 +76,7 @@
 </section>
 
 <section id="features" class="section" aria-labelledby="features-title">
-  <p class="eyebrow">FEATURES</p><h2 id="features-title">Built for the complete microscopy image workflow.</h2>
+  <p class="eyebrow">FEATURES</p><h2 id="features-title">Working with microscopy images</h2>
   <div class="grid">
     <article><b>01</b><h3>AFB detection</h3><p>The model identifies candidate acid-fast bacilli and returns bounding boxes with confidence scores.</p></article>
     <article><b>02</b><h3>Large-image support</h3><p>Tiled processing handles large microscopy images and whole-slide imaging workflows without loading an entire slide into memory.</p></article>
@@ -84,13 +84,13 @@
     <article><b>04</b><h3>Image and slide inputs</h3><p>Use common raster microscopy images directly or process supported slide formats with the OpenSlide workflow.</p></article>
     <article><b>05</b><h3>CLI inference</h3><p>Run the supplied checkpoint from the command line with configurable confidence and image-calibration options.</p></article>
     <article><b>06</b><h3>Local web interface</h3><p>A FastAPI service and browser interface support local image review and annotation workflows.</p></article>
-    <article><b>07</b><h3>Python-first stack</h3><p>Built with PyTorch, Ultralytics YOLO, OpenCV, OpenSlide, and FastAPI for local research use.</p></article>
-    <article><b>08</b><h3>Reusable model artifact</h3><p>The included <code>best.pt</code> checkpoint can be verified with its SHA-256 sidecar before local use.</p></article>
+    <article><b>07</b><h3>Python libraries</h3><p>Built with PyTorch, Ultralytics YOLO, OpenCV, OpenSlide, and FastAPI for local research use.</p></article>
+    <article><b>08</b><h3>Included model weights</h3><p>The included <code>best.pt</code> checkpoint can be verified with its SHA-256 sidecar before local use.</p></article>
   </div>
 </section>
 
 <section id="workflow" class="section split" aria-labelledby="workflow-title">
-  <div><p class="eyebrow">WORKFLOW</p><h2 id="workflow-title">From microscopy image to candidate detections.</h2><p>The system separates image loading, deep-learning inference, post-processing, and review so each step remains clear and reusable.</p></div>
+  <div><p class="eyebrow">WORKFLOW</p><h2 id="workflow-title">From microscopy image to candidate detections.</h2><p>Overlapping tiles help cover objects near tile edges. The detector compares boxes across tiles to remove repeated detections.</p></div>
   <ol class="steps">
     <li><span>01</span><div><strong>Choose an image or slide</strong><p>Provide a raster Ziehl–Neelsen microscopy image or a supported whole-slide image.</p></div></li>
     <li><span>02</span><div><strong>Tile when needed</strong><p>Large images are divided into overlapping tiles to preserve detail and control memory use.</p></div></li>
@@ -133,7 +133,7 @@
 </section>
 
 <section id="architecture" class="section" aria-labelledby="architecture-title">
-  <p class="eyebrow">ARCHITECTURE</p><h2 id="architecture-title">A compact pipeline for microscopy analysis.</h2>
+  <p class="eyebrow">ARCHITECTURE</p><h2 id="architecture-title">Processing steps</h2>
   <div class="architecture" aria-label="Model processing architecture">
     <div><span>Input</span><strong>ZN microscopy image / WSI</strong></div><i aria-hidden="true">→</i>
     <div><span>Imaging</span><strong>OpenCV / OpenSlide</strong></div><i aria-hidden="true">→</i>
@@ -165,8 +165,8 @@ python 02_CODE/scripts/04_inference.py --model 03_MODELS/best.pt --wsi path/to/m
 </section>
 
 <section class="section public-note" aria-labelledby="public-note-title">
-  <div><p class="eyebrow">OPEN SOURCE</p><h2 id="public-note-title">A practical starting point for AFB image analysis.</h2></div>
-  <p>The repository includes the model artifact, inference scripts, large-image processing, a local API, and a browser-based review interface. Use it as a transparent foundation for microscopy research and local method development.</p>
+  <div><p class="eyebrow">OPEN SOURCE</p><h2 id="public-note-title">Code and model weights</h2></div>
+  <p>The repository includes the model artifact, inference scripts, large-image processing, a local API, and a browser-based review interface. The README includes commands for running the model and opening the local review interface.</p>
 </section>
 </main>
 

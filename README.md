@@ -8,9 +8,9 @@
 [Quick start](#quick-start) ·
 [Run locally](#local-web-interface)
 
-TB-AFB Detection is a deep-learning object-detection model for locating candidate acid-fast bacilli (AFB) in Ziehl–Neelsen microscopy images. The included single-class Ultralytics YOLOv8n model was trained for 150 epochs on labelled microscopy imagery and returns bounding boxes with confidence scores.
+The included YOLOv8n model marks possible acid-fast bacilli (AFB) in Ziehl–Neelsen microscopy images. It returns a bounding box for each candidate and assigns a confidence score. The checkpoint comes from a 150-epoch development run.
 
-It can analyse standard microscopy images directly and uses tile-based processing for large images and compatible whole-slide imaging workflows.
+Use a standard microscopy image or a supported whole-slide image. The command-line tool processes large images in tiles.
 
 > **Research use only.** Model output identifies visual AFB candidates; it does not identify *Mycobacterium tuberculosis*, confirm tuberculosis, or replace laboratory or clinical judgement.
 
@@ -35,7 +35,7 @@ It can analyse standard microscopy images directly and uses tile-based processin
 | mAP@50 | 0.6406 |
 | mAP@50–95 | 0.3119 |
 
-These values describe the recorded development run. They are presented as model-development outputs, not diagnostic or clinical performance claims.
+These are development-run metrics. See the [model card](MODEL_CARD.md) for evaluation limits.
 
 ## What is included
 
@@ -103,14 +103,13 @@ The repository keeps raw microscopy data and generated research outputs out of v
 
 ## Limitations
 
+- The optional CLI grading output uses the model’s candidate count. Use confirmed microscopy counts for smear grading.
 - Candidate AFB detection is not species identification and does not confirm tuberculosis.
 - Output can vary with staining, optics, scanner or microscope characteristics, image quality, and specimen preparation.
 - Review predictions alongside the original image and the appropriate laboratory workflow.
 - Whole-slide processing depends on compatible readers and correct image calibration.
 
-## Technology
-
-Python, PyTorch, Ultralytics YOLO, OpenCV, OpenSlide, NumPy, FastAPI, and a static GitHub Pages site.
+For the annotation and training toolkit, see [TB AFB Detection](https://github.com/abusuraihsakhri/tb_afb_detection).
 
 ## License
 
