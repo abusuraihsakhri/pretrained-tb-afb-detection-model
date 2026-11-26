@@ -111,6 +111,12 @@ The repository keeps raw microscopy data and generated research outputs out of v
 
 For the annotation and training toolkit, see [TB AFB Detection](https://github.com/abusuraihsakhri/tb_afb_detection).
 
+## Citation
+
+Sakhri, A. S. (2026). *TB-AFB Detection Research Pipeline* (version 36e46412c6b3) [Computer software]. Zenodo. [10.5281/zenodo.24565570](https://doi.org/10.5281/zenodo.24565570).
+
+The Zenodo archive contains the cited source snapshot. Model weights are excluded.
+
 ## License
 
 Code is available under the [Apache License 2.0](LICENSE).
